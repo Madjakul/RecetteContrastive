@@ -1,0 +1,80 @@
+# recette_contrastive/utils/configs/base_config.py
+
+import logging
+from dataclasses import dataclass, fields
+from pathlib import Path
+from typing import Any, Dict, Optional, Union
+
+import yaml
+
+from recette_contrastive.utils.configs.data_config import DataConfig
+from recette_contrastive.utils.configs.model_config import ModelConfig
+from recette_contrastive.utils.configs.preprocess_config import PreprocessConfig
+from recette_contrastive.utils.configs.train_config import TrainConfig
+from recette_contrastive.utils.helpers import DictAccessMixin
+
+
+@dataclass
+class BaseConfig(DictAccessMixin):
+    project_name: str = "recette-contrastive"
+    group_name: Optional[str] = None
+
+    data: DataConfig = DataConfig()
+    model: ModelConfig = ModelConfig()
+    train: TrainConfig = TrainConfig()
+    preprocess: PreprocessConfig = PreprocessConfig()
+
+    @classmethod
+    def from_yaml(cls, yaml_path: Union[str, Path]) -> "BaseConfig":
+        """Load configuration from YAML file and override defaults."""
+        with open(yaml_path, "r") as f:
+            yaml_data = yaml.safe_load(f)
+
+        return cls.from_dict(yaml_data)
+
+    @classmethod
+    def from_dict(cls, config_dict: Dict[str, Any]) -> "BaseConfig":
+        """Create configuration from dictionary, overriding defaults.
+
+        Parameters
+        ----------
+        config_dict: Dict[str, Any]
+            Dictionary containing configuration parameters.
+        """
+        config = cls()
+
+        for section_name, section_data in config_dict.items():
+            if hasattr(config, section_name) and isinstance(section_data, dict):
+                section_config = getattr(config, section_name)
+                for key, value in section_data.items():
+                    if hasattr(section_config, key):
+                        setattr(section_config, key, value)
+                    else:
+                        logging.warning(
+                            f"Unknown config key '{key}' in section '{section_name}'"
+                        )
+            elif hasattr(config, section_name):
+                setattr(config, section_name, section_data)
+            else:
+                logging.warning(f"Unknown config section '{section_name}'")
+
+        return config
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert configuration to dictionary."""
+        result = {}
+        for field in fields(self):
+            section_config = getattr(self, field.name)
+            if hasattr(section_config, "__dict__"):
+                result[field.name] = {
+                    f.name: getattr(section_config, f.name)
+                    for f in fields(section_config)
+                }
+            else:
+                result[field.name] = section_config
+        return result
+
+    def save_yaml(self, yaml_path: Union[str, Path]) -> None:
+        """Save current configuration to YAML file."""
+        with open(yaml_path, "w") as f:
+            yaml.dump(self.to_dict(), f, default_flow_style=False, indent=2)
