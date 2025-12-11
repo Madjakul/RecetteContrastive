@@ -7,7 +7,7 @@ DATA_ROOT=$PROJECT_ROOT/data                     # Do not modify
 
 CONFIG_PATH=$PROJECT_ROOT/configs/train.yml
 LOGS_DIR=$PROJECT_ROOT/logs
-PROCESSED_DS_DIR=$PROJECT_ROOT/data/
+PROCESSED_DS_PATH=$PROJECT_ROOT/data/
 
 # --------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ cmd=()
 cmd=(python3 "$PROJECT_ROOT/train.py"
     --config_path "$CONFIG_PATH"
     --logs_dir "$LOGS_DIR"
-    --processed_ds_path "$PROCESSED_DS_DIR")
+    --processed_ds_path "$PROCESSED_DS_PATH")
 
 if [[ -v NUM_PROC ]]; then
     cmd+=(--num_proc "$NUM_PROC")

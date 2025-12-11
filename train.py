@@ -38,7 +38,7 @@ if __name__ == "__main__":
     num_proc = int(args.num_proc / max(1, trainer.world_size))
     dm = train_utils.setup_datamodule(
         cfg=cfg,
-        processed_ds_dir=args.processed_ds_dir,
+        processed_ds_path=args.processed_ds_path,
         num_proc=num_proc,
         cache_dir=args.cache_dir,
     )

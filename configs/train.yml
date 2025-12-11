@@ -1,0 +1,41 @@
+# train.yml
+
+project_name: "recette-contrastive"
+
+data:
+  batch_size: 32
+  tokenizer_name: "almanach/camembertav2-base"
+  max_length: 512
+  padding: "max_length" # max_length, false
+  map_batch_size: 1000
+  load_from_cache_file: true
+  shuffle: true
+
+model:
+  base_model_name: "almanach/camembertav2-base"
+
+train:
+  tau: 0.07 # Only for CE losses
+  # --- optimizer ---
+  lr: 2.0e-5
+  weight_decay: 0.01
+  # --- checkpointing ---
+  checkpoint_metric: "val_mrr"
+  checkpoint_mode: "max"
+  save_top_k: 1
+  # --- trainer ---
+  gather: true
+  device: "gpu"
+  num_devices: 3
+  strategy: "ddp_find_unused_parameters_true"
+  max_steps: -1
+  max_epochs: 1
+  log_every_n_steps: 1
+  accumulate_grad_batches: 1
+  gradient_clip_val: null
+  precision: "16-mixed" # 16-mixed, 32
+  overfit_batches: 0.0
+  # --- wandb ---
+  use_wandb: false
+  log_model: false
+  watch: null # parameters, gradients, all, null
