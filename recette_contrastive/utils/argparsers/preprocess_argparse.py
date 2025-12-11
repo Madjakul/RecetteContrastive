@@ -13,12 +13,6 @@ class PreprocessArgparse:
             )
         )
         parser.add_argument(
-            "--config_path",
-            type=str,
-            required=True,
-            help="Emplacement du fichier de configuration `preprocess.yml`.",
-        )
-        parser.add_argument(
             "--logs_dir",
             type=str,
             required=True,
@@ -29,17 +23,6 @@ class PreprocessArgparse:
             type=str,
             required=True,
             help="Emplacement de vos données une fois traîtées et tokenisées.",
-        )
-        parser.add_argument(
-            "--num_proc",
-            type=int,
-            default=1,
-            help=(
-                "Nombre de processeurs à utiliser pour le multiprocessing. Le"
-                " La transformation de PDFs en text ainsi que le sampling de passage"
-                " peut être considérablement acceléré si effectué en parallèle."
-                " Un grand nombre de processeurs est conseillé ici."
-            ),
         )
         args, _ = parser.parse_known_args()
         return args
